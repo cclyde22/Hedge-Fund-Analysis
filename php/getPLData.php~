@@ -1,0 +1,78 @@
+<?php
+	$SEC_LEV = $SEC_LEV_ARR['low'];
+	include($CHECK_USER);
+	require_once("class_http.php");
+	
+	if(!$con){
+		die('could not connect: ' . mysqli_error($con));
+	}
+	mysqli_select_db($con, $db);
+
+  function hasExpired($tick){
+  		$expired = FALSE;	
+		$regexp = '/\s\d\d\/\d\d\/\d\d/';
+		if(preg_match($regexp,$tick,$matches)){
+				$expiration = $matches[0];
+				if (strtotime($expiration) < time())
+					$expired = TRUE;
+		}
+		return $expired;
+	}
+
+	function getPrices($tick,$buysell){
+		global $BLOOM_PC;
+
+		$type = "";
+		if(!hasExpired($tick))
+			if($buysell == -1)
+		    	$type = "ptype=BID";
+		  else
+		  		$type = "ptype=ASK";
+		
+		$tick = str_replace(" ","%20",$tick);
+		$h = new http();		
+		$h->url = $BLOOM_PC . $type . "&tick[]=$tick";
+		$h->postvars = $_POST;
+		$h->fetch($h->url);
+
+		return $h->body;
+	}
+	
+	function calcCurPrice($ticks, $addsub, $quants, $options){
+		$price = 0.0;
+		for($i=0;$i < count($addsub);$i++)
+			$price += $addsub[$i]*$ticks[$i*4+2]*$quants[$i]*$options[$i];
+
+		return $price;
+	}
+	
+	$query = "SELECT ticker,quant,price,ordertype from tactical,trades where groupId={$_GET['groupId']} AND tactical.tradeId=trades.tradeId";
+	$result = mysqli_query($con, $query);
+	$oldprice = 0.0;
+	while($row = mysqli_fetch_assoc($result)){
+		$info = $row;
+		$buysell = 1;
+		if($row['ordertype'] == "Buy")
+			$buysell = -1;
+		$option = 1;
+		if(strpos($row['ticker'],"/"))
+		    $option = 100;
+		$oldprice += $row['price']*$row['quant']*$buysell*$option;
+		$ticks[] = $row['ticker']; 
+		$addsub[] = $buysell;
+		$quants[] = $row['quant'];
+		$options[] = $option;
+	}
+
+    for($i=0;$i < count($ticks);$i++)
+        $prices .= getPrices($ticks[$i],$addsub[$i]); 
+    
+	$curprice = calcCurPrice(explode(',',$prices),$addsub,$quants,$options);
+	
+	$pl = $oldprice-$curprice;
+	$pl = round($pl,3);
+	
+	echo json_encode(Array($_GET['groupId'], $pl));
+
+	mysqli_close($con);
+?>
