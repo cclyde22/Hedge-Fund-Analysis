@@ -10,18 +10,28 @@
 requestClientsURL = @"php/getJSONClients.php";
 requestTestFundURL = @"php/getJSONTestFunds.php";
 requestFundsURL = @"php/getJSONFunds.php";
+requestNavURL = @"php/getJSONNAVs.php";
+requestEstNAVURL = @"php/getJSONEstNAVs.php";
+requestReturnURL = @"php/getJSONReturns.php";
+requestSourceURL = @"php/getJSONSource.php";
+requestDateURL = @"php/getJSONDate.php";
+requestReturnYtdURL = @"php/getJSONReturnYtd.php";
+requestActualYtdURL = @"php/getJSONActualYtd.php";
+requestPlusMinusURL = @"php/getJSONPlusMinus.php";
 addReturnsURL = @"php/addReturns.php";
+
 
 
 fundColId = @"Funds";
 clientColId = @"Clients";
 navColId = @"NAVs";
 estNavColId = @"Est. NAVs";
-estReturnColId = @"Est. Return";
-realReturnColId = @"Real Return";
+returnColId = @"Returns";
+pricingSourceColId = @"Source";
 dateColId = @"Date";
 estReturnYtdColId = @"Est. Ytd Return";
 actualYtdColId = @"Actual Ytd";
+plusMinusColId = @"+/-";
 sourceColId = @"Source";
 
 groupColHeaderName = @"groupId";

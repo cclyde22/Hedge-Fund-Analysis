@@ -1,5 +1,6 @@
 <?php
-	$client = $_GET['client'];
+	$return = $_GET['return'];
+	$returnYtd = $_GET['returnYtd'];
 // New Connection
 	$db = new mysqli('localhost','root','123Pass123','hfdb');
 
@@ -8,7 +9,12 @@
  		echo mysqli_connect_error();
 	}
 //Query
-	$result = $db->query("SELECT name FROM Fund WHERE fundID IN (SELECT fundID from Series WHERE clientID = (SELECT clientID FROM Client WHERE name = '$client'))");
+	if($return != ""){
+		$result = $db->query("SELECT date FROM Returns WHERE value = '$return'");
+	}
+	else if($returnYtd != ""){
+		$result = $db->query("SELECT date FROM ReturnYtd WHERE value = '$returnYtd'");
+	}
 	if($result){
 // Cycle through results
     	while($r = mysqli_fetch_row($result)){

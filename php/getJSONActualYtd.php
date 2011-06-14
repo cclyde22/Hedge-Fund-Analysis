@@ -8,7 +8,7 @@
  		echo mysqli_connect_error();
 	}
 //Query
-	$result = $db->query("SELECT name FROM Fund WHERE fundID IN (SELECT fundID from Series WHERE clientID = (SELECT clientID FROM Client WHERE name = '$client'))");
+	$result = $db->query("SELECT value FROM ActualYtd WHERE seriesID IN (SELECT seriesID FROM Series WHERE clientID = (SELECT clientID FROM Client WHERE name = '$client'))");
 	if($result){
 // Cycle through results
     	while($r = mysqli_fetch_row($result)){
